@@ -39,12 +39,10 @@ public class TitleManager : MonoBehaviour
         {
             SoundOnButton.SetActive(true);
         }
-    }
 
-    public void SendButton()
-    {
-        playFabController.SendPlayScore(10);
-        buttonSound.PlaySound();
+        adManager.RequestBanner();
+        ShowATTDialog.RequestIDFA();
+
     }
 
     public void RankingButton()
@@ -54,23 +52,6 @@ public class TitleManager : MonoBehaviour
         buttonSound.PlaySound();
     }
 
-    public void BannerButton()
-    {
-        adManager.RequestBanner();
-        buttonSound.PlaySound();
-    }
-
-    public void InterstitalButton()
-    {
-        adManager.showInterstitialAd();
-        buttonSound.PlaySound();
-    }
-
-    public void RewardButton()
-    {
-        adManager.showRewardAd();
-        buttonSound.PlaySound();
-    }
 
     public void CloseRankingButton()
     {
@@ -131,6 +112,7 @@ public class TitleManager : MonoBehaviour
 
     public void StartButton()
     {
+        adManager.DestroyBanner();
         SceneManager.LoadScene("Gamescene");
     }
 }

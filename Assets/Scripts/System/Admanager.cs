@@ -10,7 +10,7 @@ public class AdManager : MonoBehaviour
     private InterstitialAd interstitial;
     private RewardedAd rewardedAd;
     private BannerView bannerView;
-    public static int guSpeed, playTimes;
+    public static int playTimes;
 
     public void Start()
     {
@@ -32,6 +32,7 @@ public class AdManager : MonoBehaviour
 
         this.loadInterstitialAd();
         loadRewardAd();
+        MobileAds.SetiOSAppPauseOnBackground(true);
     }
 
     public void RequestBanner()
@@ -39,7 +40,7 @@ public class AdManager : MonoBehaviour
 #if UNITY_ANDROID
         string adUnitId = "ca-app-pub-3940256099942544/6300978111"; // テスト用広告ユニットID
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/2934735716"; // テスト用広告ユニットID
+        string adUnitId = "ca-app-pub-9513540879579446/6709036744"; // テスト用広告ユニットID
 #else
             string adUnitId = "unexpected_platform";
 #endif
@@ -67,7 +68,7 @@ public class AdManager : MonoBehaviour
 #if UNITY_ANDROID
     string adUnitId = "ca-app-pub-3940256099942544/1033173712";
 #elif UNITY_IPHONE
-        string adUnitId = "ca-app-pub-3940256099942544/4411468910";
+        string adUnitId = "ca-app-pub-9513540879579446/9101575413";
 #else
         string adUnitId = "unexpected_platform";
 #endif
@@ -101,6 +102,8 @@ public class AdManager : MonoBehaviour
     {
         this.interstitial.Destroy();
         this.loadInterstitialAd();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 
     public void showInterstitialAd()
@@ -121,7 +124,7 @@ public class AdManager : MonoBehaviour
 #if UNITY_ANDROID
     adUnitId = "ca-app-pub-3940256099942544/5224354917";
 #elif UNITY_IPHONE
-        adUnitId = "ca-app-pub-3940256099942544/1712485313";
+        adUnitId = "ca-app-pub-9513540879579446/5705255885";
 #else
         adUnitId = "unexpected_platform";
 #endif
@@ -176,8 +179,7 @@ public class AdManager : MonoBehaviour
 
     public void HandleRewardedAdAdClosed()
     {
-        guSpeed = 30;
-        SceneManager.LoadScene("GameScene");
+        GameObject.Find("Board").GetComponent<Board>().Continue();
         loadRewardAd();
     }
 }

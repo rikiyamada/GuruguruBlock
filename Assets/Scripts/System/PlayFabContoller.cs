@@ -103,7 +103,7 @@ public class PlayFabController : MonoBehaviour
         {
             StatisticName = "HighScore", // 統計情報名を指定します。
             StartPosition = 0, // 何位以降のランキングを取得するか指定します。
-            MaxResultsCount = 10 // ランキングデータを何件取得するか指定します。最大が100です。
+            MaxResultsCount = 15 // ランキングデータを何件取得するか指定します。最大が100です。
         };
 
         PlayFabClientAPI.GetLeaderboard(request, OnSuccess, OnError);
@@ -115,15 +115,14 @@ public class PlayFabController : MonoBehaviour
             // 実際は良い感じのランキングを表示するコードにします。
             foreach (var item in leaderboardResult.Leaderboard)
             {
-                float scoreAsFloat = item.StatValue / 10f;
-                if (item.DisplayName == " ")
+                if (item.DisplayName == null)
                 {
-                    RankingText.text += $"{item.Position + 1}位: ななしさん  {scoreAsFloat}\n";
+                    RankingText.text += $"{item.Position + 1}位: ななしさん  {item.StatValue}\n";
 
                 }
                 else
                 {
-                    RankingText.text += $"{item.Position + 1}位: {item.DisplayName}  {scoreAsFloat}\n";
+                    RankingText.text += $"{item.Position + 1}位: {item.DisplayName}  {item.StatValue}\n";
                 }
                 i++;
                 if (i >= 15) return;
@@ -154,15 +153,14 @@ public class PlayFabController : MonoBehaviour
             // 実際は良い感じのランキングを表示するコードにします。
             foreach (var item in result.Leaderboard)
             {
-                float scoreAsFloat = item.StatValue / 10f;
-                 if(item.DisplayName == "")
+                 if(item.DisplayName == null)
                 {
-                    RankingText.text += $"{item.Position + 1}位: ななしさん  {scoreAsFloat}\n";
+                    RankingText.text += $"{item.Position + 1}位: ななしさん  {item.StatValue}\n";
 
                 }
                 else
                 {
-                    RankingText.text += $"{item.Position + 1}位: {item.DisplayName}  {scoreAsFloat}\n";
+                    RankingText.text += $"{item.Position + 1}位: {item.DisplayName}  {item.StatValue}\n";
                 }
             }
         }

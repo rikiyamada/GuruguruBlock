@@ -5,14 +5,16 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System;
+using UnityEngine.iOS;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
     private TMP_Text scoreText, deleteText, hiscoreText;
     [SerializeField]
-    private GameObject ResultPanel, RankingPanel;
+    private GameObject ResultPanel, RankingPanel, ContinuePanel;
     private PlayFabController playFabController;
+    private AdManager adManager;
     private Animator deleteAnimator, resultScoreAnimator, WarningAnimator;
     public Spawner spawner;
     public Board board;
@@ -22,10 +24,12 @@ public class GameManager : MonoBehaviour
     public bool isSleep = true, rotate = false, scoreUp = false;
     Vector3 startPos;
     private int score = 0;
+    static int totalScore;
 
     void Start()
     {
         Spawn();
+        adManager = GameObject.Find("AdManager").GetComponent<AdManager>();
         WarningAnimator = GameObject.Find("WarningAnimator").GetComponent<Animator>();
         deleteAnimator = GameObject.Find("DeleteAnimator").GetComponent<Animator>();
         resultScoreAnimator = GameObject.Find("ScoreText").GetComponent<Animator>();
@@ -33,6 +37,8 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.SetInt("PlayCount", PlayerPrefs.GetInt("PlayCount",0) + 1);
         PlayerPrefs.Save();
+
+        adManager.RequestBanner();
     }
 
 
@@ -179,12 +185,22 @@ public class GameManager : MonoBehaviour
         deleteAnimator.Play("DeleteAnimation", 0, 0);
     }
 
+    public void CheckContinue()
+    {
+#if UNITY_IOS
+        //Handheld.Vibrate();
+#endif
+        ContinuePanel.SetActive(true);
+    }
+
     public void GameOver()
     {
         int highScore = PlayerPrefs.GetInt("HighScore", 0);
 
         ResultPanel.SetActive(true);
         hiscoreText.text = "HighSocre\n" + highScore;
+
+        totalScore += score;
 
         resultScoreAnimator.transform.SetParent(ResultPanel.transform, false);
         resultScoreAnimator.transform.SetAsFirstSibling();
@@ -197,17 +213,33 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("HighScore", score);
             PlayerPrefs.Save();
         }
+
+        if(PlayerPrefs.GetInt("PlayCount",0) % 5 == 0)
+        {
+            #if UNITY_IOS
+            Device.RequestStoreReview();
+            #endif
+        }
     }
 
     public void RetryButton()
     {
         VibrationMng.ShortVibration();
+        adManager.DestroyBanner();
+        if(totalScore >= 300)
+        {
+            totalScore = 0;
+            adManager.showInterstitialAd();
+            return;
+        }
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void HomeButton()
     {
+        adManager.DestroyBanner();
         VibrationMng.ShortVibration();
+        adManager.DestroyBanner();
         SceneManager.LoadScene("TitleScene");
     }
 
@@ -228,5 +260,18 @@ public class GameManager : MonoBehaviour
     {
         playFabController.GetAroundRanking();
         VibrationMng.ShortVibration();
+    }
+
+    public void YesContinue()
+    {
+        ContinuePanel.SetActive(false);
+        adManager.showRewardAd();
+    }
+
+    public void NoContinue()
+    {
+        ContinuePanel.SetActive(false);
+        GameOver();
+
     }
 }

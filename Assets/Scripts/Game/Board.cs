@@ -9,6 +9,7 @@ public class Board : MonoBehaviour
     private int height = 10, width = 10, totalDeleteLine = 0;
     private GameObject[,] grid;
     private GameManager gameManager;
+    private bool isContinue = false;
 
     [SerializeField]
     private AudioSource blockSound, deleteSound;
@@ -167,6 +168,7 @@ public class Board : MonoBehaviour
 
         for (int x = 0; x < width; x++)
         {
+            if (grid[x, deletey] != null)
             Destroy(grid[x, deletey]);
         }
     }
@@ -189,13 +191,24 @@ public class Board : MonoBehaviour
         {
             if (grid[x, 10])
             {
-                gameManager.GameOver();
+                if(isContinue) gameManager.GameOver();
+                else gameManager.CheckContinue();
                 return;
             }
         }
 
         gameManager.Spawn();
-        
+    }
+
+    public void Continue()
+    {
+        isContinue = true;
+        for(int y = 0; y < 4; y++)
+        {
+            StartCoroutine(DestroyCoroutine(y));
+        }
+        deleteSound.Play();
+        StartCoroutine(ChangeGravityScaleCoroutine());
     }
 
     public void UpDateGrid()
@@ -229,6 +242,4 @@ public class Board : MonoBehaviour
     {
         blockSound.Play();
     }
-
-
 }
